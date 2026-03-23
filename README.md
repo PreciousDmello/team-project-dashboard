@@ -1,5 +1,3 @@
-# Velocity Global Project Dashboard
-
 Real-time internal dashboard for agency project delivery with strict API-level RBAC, WebSocket live activity feed, notifications, and overdue task automation.
 
 ## Stack

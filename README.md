@@ -55,11 +55,6 @@ Index highlights:
 docker compose up --build
 ```
 
-Services:
-- Frontend: [http://localhost:5173](http://localhost:5173)
-- Backend: [http://localhost:3001](http://localhost:3001)
-- Postgres: `localhost:5432`
-
 ### Non-Docker
 
 1. Create DB and set `backend/.env` (copy from `backend/.env.example`).
@@ -95,8 +90,3 @@ Default password for seeded users: `password123`
 - UI is intentionally compact and functional; it is not yet fully optimized for mobile workflows.
 - Cron-based overdue checks run every 15 minutes; a queue-based architecture would scale better for very large workloads.
 
-## Explanation (Hardest Problem Solved)
-
-The hardest problem was enforcing role-filtered real-time delivery without leaking data across project rooms. A naive room model lets any developer in a project receive all project events, which violates the requirement that developers can only see activity for tasks assigned to them. I solved this by moving event fan-out from broad project-room broadcasting to recipient-targeted emits. On each task change, the backend now computes recipients from persisted relationships: all admins (global room), the owning PM (project creator), and only developers assigned to the affected task. The activity event itself is still persisted in `ActivityLog` first, then emitted, so reconnect and missed-event workflows remain source-of-truth in PostgreSQL.  
-
-For offline catch-up, clients persist a timestamp and call `/api/activity/missed`, which returns the last 20 authorized events directly from DB with role-aware filtering. If I were to improve one thing, I would centralize real-time authorization into a dedicated event broker module with integration tests that replay task transitions and assert exact recipient sets for each role.
